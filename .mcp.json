@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "uiprompts": {
+      "command": "npx",
+      "args": ["-y", "uiprompts-mcp"],
+      "env": {
+        "UIPROMPTS_API_KEY": "19c58b83-6af0-4760-bcb4-fa8b1583f738"
+      }
+    }
+  }
+}
