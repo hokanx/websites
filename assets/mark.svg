@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Shi">
+  <rect width="200" height="200" fill="#0C1F24" />
+  <text x="100" y="132" text-anchor="middle"
+        font-family="Archivo Black, Arial Black, sans-serif" font-size="128"
+        fill="#F2EAD9">S</text>
+  <circle cx="100" cy="160" r="5" fill="#E4863A" />
+</svg>
