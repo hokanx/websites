@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.frames-tmp/
+*.tmp.mjs
+refs/
+film/
+.DS_Store

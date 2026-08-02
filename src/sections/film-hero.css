@@ -1,0 +1,278 @@
+.film {
+  position: relative;
+  /* One screen of scroll runway per chapter, plus the resolve. */
+  height: calc(140vh * var(--chapters));
+  background: var(--ink);
+}
+
+.film__sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  /* Ground for the moments before the poster or the frames exist. */
+  background:
+    radial-gradient(120% 80% at 22% 15%, color-mix(in srgb, var(--stamp) 16%, transparent), transparent 62%),
+    radial-gradient(90% 70% at 78% 85%, #2a1c16, transparent 70%),
+    var(--ink);
+}
+
+.film__poster,
+.film__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.film__canvas {
+  z-index: 1;
+  /* Transparent until frames exist, so the poster carries the hero. */
+  opacity: 0;
+}
+
+.film__canvas.is-live {
+  opacity: 1;
+}
+
+.film__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(to top, var(--ink) 2%, color-mix(in srgb, var(--ink) 55%, transparent) 34%, transparent 62%),
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 72%, transparent), transparent 58%);
+}
+
+/* ---------- progress rail ---------- */
+
+.film__rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  width: 3px;
+  height: 100%;
+  background: color-mix(in srgb, var(--bun) 12%, transparent);
+}
+
+.film__rail-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--stamp);
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+
+/* ---------- chrome ---------- */
+
+.film__topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 3px;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.4rem var(--gutter);
+  border-bottom: 1px solid color-mix(in srgb, var(--bun) 10%, transparent);
+}
+
+.film__topbar .mono {
+  color: var(--bun);
+}
+
+.film__hint {
+  position: absolute;
+  bottom: 1.6rem;
+  right: calc(var(--gutter) + 1rem);
+  z-index: 6;
+}
+
+/* ---------- chapter stages ---------- */
+
+.film__stages {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  align-content: end;
+  padding: 0 var(--gutter) clamp(5.5rem, 14vh, 9rem);
+  pointer-events: none;
+}
+
+.film__stage {
+  grid-area: 1 / 1;
+  align-self: end;
+  max-width: min(92vw, 46rem);
+  will-change: clip-path, transform;
+}
+
+.film__stage-kicker {
+  display: block;
+  color: var(--stamp);
+  margin-bottom: 1rem;
+}
+
+.film__stage-headline {
+  font-size: clamp(2.2rem, 6vw, 5.4rem);
+  margin-bottom: 1.1rem;
+}
+
+.film__stage-body {
+  max-width: 34ch;
+  color: color-mix(in srgb, var(--bun) 72%, transparent);
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.1rem);
+}
+
+/* ---------- logo landing ---------- */
+
+.film__logo {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  visibility: hidden;
+}
+
+.film__logo-mark {
+  width: min(52vw, 26rem);
+  height: auto;
+  color: var(--bun);
+}
+
+/* ---------- hero CTA: notched corner block ---------- */
+
+.cta-notch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.2rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bun);
+  background: transparent;
+  border: 1px solid var(--bun);
+  /* the stamp corner cut */
+  clip-path: polygon(0 0, 100% 0, 100% 62%, calc(100% - 1.1rem) 100%, 0 100%);
+  overflow: hidden;
+}
+
+.cta-notch span {
+  position: relative;
+  z-index: 1;
+  transition: color 0.28s ease;
+}
+
+.cta-notch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--stamp);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta-notch:hover::before,
+.cta-notch:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.cta-notch:hover,
+.cta-notch:focus-visible {
+  border-color: var(--stamp);
+}
+
+.film__cta {
+  position: absolute;
+  left: var(--gutter);
+  bottom: clamp(1.6rem, 5vh, 3rem);
+  z-index: 8;
+}
+
+/* ---------- responsive + reduced motion ---------- */
+
+@media (max-width: 720px) {
+  .film {
+    height: calc(98vh * var(--chapters));
+  }
+
+  .film__stage {
+    max-width: none;
+  }
+
+  .film__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No pin and no scrub: the hero becomes an ordinary stacked block, with the
+     still (or the ground gradient) sitting behind it and chapter one only. */
+  .film {
+    height: auto;
+  }
+
+  .film__sticky {
+    position: relative;
+    height: auto;
+    min-height: min(82vh, 38rem);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .film__stages {
+    position: relative;
+    inset: auto;
+    flex: 1;
+    align-content: end;
+    padding-top: clamp(3rem, 10vh, 6rem);
+  }
+
+  .film__stage:not(:first-child) {
+    display: none;
+  }
+
+  /* Never leave the one visible chapter clipped by a stale inline style. */
+  .film__stage {
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  .film__logo {
+    position: relative;
+    inset: auto;
+    background: none;
+    place-items: start;
+    padding: clamp(1.5rem, 5vh, 2.5rem) var(--gutter) 0;
+  }
+
+  .film__logo-mark {
+    width: min(46vw, 13rem);
+  }
+
+  .film__cta {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    align-self: start;
+    margin: clamp(1.5rem, 4vh, 2.2rem) var(--gutter) clamp(2rem, 5vh, 3rem);
+  }
+
+  .film__rail,
+  .film__hint {
+    display: none;
+  }
+}

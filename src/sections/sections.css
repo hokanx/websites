@@ -1,0 +1,505 @@
+/* ============ 02 · About — editorial offset ============ */
+
+.about__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 7vw, 7rem);
+  align-items: start;
+}
+
+.about__lead h2 {
+  font-size: clamp(2.4rem, 7vw, 5.6rem);
+  margin-bottom: 2rem;
+}
+
+.about__lead em {
+  font-style: normal;
+  color: var(--stamp);
+}
+
+.about__body {
+  max-width: 46ch;
+  color: color-mix(in srgb, var(--bun) 76%, transparent);
+}
+
+.about__body + .about__body {
+  margin-top: 1.1rem;
+}
+
+.about__rail {
+  border-top: var(--rule);
+}
+
+.about__rail-row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.05rem 0;
+  border-bottom: var(--rule);
+  align-items: baseline;
+}
+
+.about__rail-row small {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.about__branches {
+  color: color-mix(in srgb, var(--bun) 70%, transparent);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+  .about__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============ 03 · Menu — accordion rows ============ */
+
+.menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--rule);
+}
+
+.menu__row {
+  border-bottom: var(--rule);
+}
+
+.menu__trigger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'kicker mark' 'name mark';
+  align-items: center;
+  gap: 0.35rem 1.5rem;
+  width: 100%;
+  padding: clamp(1.4rem, 3vw, 2.2rem) 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu__kicker {
+  grid-area: kicker;
+}
+
+.menu__name {
+  grid-area: name;
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  transition: color 0.25s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu__row:hover .menu__name,
+.menu__trigger:focus-visible .menu__name {
+  color: var(--stamp);
+  transform: translateX(0.6rem);
+}
+
+.menu__mark {
+  grid-area: mark;
+  position: relative;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: none;
+}
+
+.menu__mark::before,
+.menu__mark::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: var(--bun);
+  transition: transform 0.3s ease;
+}
+
+.menu__mark::after {
+  transform: rotate(90deg);
+}
+
+.menu__row.is-open .menu__mark::after {
+  transform: rotate(0deg);
+}
+
+.menu__row.is-open .menu__name {
+  color: var(--stamp);
+}
+
+.menu__panel {
+  padding-bottom: clamp(1.4rem, 3vw, 2.2rem);
+  max-width: 62ch;
+}
+
+.menu__spec {
+  color: var(--bun);
+  font-size: 0.75rem;
+  line-height: 1.9;
+  letter-spacing: 0.1em;
+}
+
+.menu__note {
+  margin-top: 0.9rem;
+  color: color-mix(in srgb, var(--bun) 68%, transparent);
+}
+
+.menu__pricing {
+  margin-top: 2rem;
+}
+
+/* menu CTA — underline draw */
+.cta-underline {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 2.5rem;
+  text-decoration: none;
+}
+
+.cta-underline__label {
+  position: relative;
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  text-transform: uppercase;
+  padding-bottom: 0.35rem;
+}
+
+.cta-underline__label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--stamp);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta-underline:hover .cta-underline__label::after,
+.cta-underline:focus-visible .cta-underline__label::after {
+  transform: scaleX(1);
+}
+
+/* ============ 04 · Process — numbered rail ============ */
+
+.process__wrap {
+  position: relative;
+  padding-left: clamp(2rem, 5vw, 4rem);
+}
+
+.process__track {
+  position: absolute;
+  top: 0.4rem;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: color-mix(in srgb, var(--ash) 60%, transparent);
+}
+
+.process__track-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--stamp);
+  transform-origin: top center;
+}
+
+.process__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(2.5rem, 7vh, 4.5rem);
+}
+
+.process__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  grid-template-areas: 'icon n' 'icon title' 'icon body';
+  column-gap: 1.4rem;
+  row-gap: 0.35rem;
+  max-width: 54ch;
+}
+
+.process__dot {
+  position: absolute;
+  top: 0.55rem;
+  left: calc(clamp(2rem, 5vw, 4rem) * -1 - 4px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid var(--stamp);
+}
+
+.process__n {
+  grid-area: n;
+  color: var(--stamp);
+}
+
+.process__icon {
+  grid-area: icon;
+  align-self: start;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-top: 0.1rem;
+  color: var(--stamp);
+}
+
+.process__title {
+  grid-area: title;
+  font-size: clamp(1.35rem, 3.4vw, 2.1rem);
+  margin-top: 0.15rem;
+}
+
+.process__body {
+  grid-area: body;
+  color: color-mix(in srgb, var(--bun) 72%, transparent);
+}
+
+/* ============ 05 · Reviews — giant numeral ============ */
+
+.reviews__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.reviews__score {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.reviews__numeral {
+  font-family: var(--display);
+  font-size: clamp(7rem, 22vw, 17rem);
+  line-height: 0.78;
+  letter-spacing: -0.05em;
+  color: var(--stamp);
+}
+
+.reviews__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.reviews__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--rule);
+}
+
+.reviews__item {
+  padding: clamp(1.3rem, 3vw, 1.9rem) 0;
+  border-bottom: var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.reviews__item blockquote {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.45;
+}
+
+@media (max-width: 860px) {
+  .reviews__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* reviews CTA — ticket perforation */
+.cta-ticket {
+  display: inline-block;
+  margin-top: 2.6rem;
+  padding: 0.95rem 2rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bun);
+  border: 1px dashed color-mix(in srgb, var(--bun) 45%, transparent);
+  transition: border-color 0.25s ease, color 0.25s ease, letter-spacing 0.3s ease;
+}
+
+.cta-ticket:hover,
+.cta-ticket:focus-visible {
+  border-color: var(--stamp);
+  color: var(--stamp);
+  letter-spacing: 0.26em;
+}
+
+/* ============ 06 · Contact — colour-blocked diptych ============ */
+
+.contact__diptych {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2px;
+  background: color-mix(in srgb, var(--ash) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ash) 55%, transparent);
+}
+
+.contact__block {
+  background: var(--stamp);
+  color: var(--ink);
+  padding: clamp(2rem, 5vw, 3.6rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+}
+
+.contact__headline {
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  color: var(--ink);
+}
+
+.contact__sub {
+  max-width: 30ch;
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
+}
+
+.contact__alts {
+  list-style: none;
+  display: flex;
+  gap: 1.4rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+
+.contact__alts .mono {
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+.contact__alts a:hover {
+  color: var(--ink);
+}
+
+/* contact CTA — stamp press */
+.cta-press {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 1.1rem 2.4rem;
+  background: var(--ink);
+  color: var(--bun);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--ink) 55%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.cta-press:hover,
+.cta-press:focus-visible {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.cta-press:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.contact__info {
+  background: var(--ink);
+  padding: clamp(2rem, 5vw, 3.6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.contact__row {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-bottom: 1.4rem;
+  border-bottom: var(--rule);
+  align-items: baseline;
+}
+
+.contact__row address {
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.contact__hours {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.contact__hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 20rem;
+}
+
+.contact__branches {
+  color: color-mix(in srgb, var(--bun) 70%, transparent);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.cta-chevron {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  color: var(--bun);
+  text-decoration: none;
+}
+
+.cta-chevron span {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta-chevron:hover,
+.cta-chevron:focus-visible {
+  color: var(--stamp);
+}
+
+.cta-chevron:hover span,
+.cta-chevron:focus-visible span {
+  transform: translateX(0.35rem);
+}
+
+@media (max-width: 860px) {
+  .contact__diptych {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============ footer ============ */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 2.2rem var(--gutter);
+  border-top: var(--rule);
+}
+
+.footer__logo {
+  width: auto;
+  color: var(--bun);
+}
