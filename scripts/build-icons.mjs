@@ -1,49 +1,68 @@
 #!/usr/bin/env node
 /**
- * Favicon set, derived from the same stamp mark used for the film landing.
+ * Favicon set, derived from the client's REAL logo artwork.
+ *
+ * Source: logo/stamp-logo.png — the cream mark lifted off the supplied
+ * screenshot onto transparency. The favicon crops the "S", because the full
+ * three-line lockup is unreadable at 32px.
+ *
  * Writes: icon.svg, favicon.ico (32px PNG payload), apple-touch-icon.png (180),
  * icon-192.png, icon-512.png, site.webmanifest.
- *
- * Re-run after swapping in the client's real logo artwork.
  */
 import sharp from 'sharp'
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs'
 
 const INK = '#17110F'
-const BUN = '#F2E7D5'
-const STAMP = '#C4392B'
+const SRC = 'logo/stamp-logo.png'
+// Measured crop of the "S" in the source artwork.
+const S_CROP = { left: 0, top: 445, width: 265, height: 367 }
 
-// Square stamp mark: cut-corner frame with a heavy S.
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="${INK}"/>
-  <path d="M8 8h40l8 8v40H16L8 48V8Z" fill="none" stroke="${STAMP}" stroke-width="3"/>
-  <text x="32" y="44" text-anchor="middle" font-family="Archivo Black, Arial Black, sans-serif"
-        font-size="30" font-weight="900" fill="${BUN}">S</text>
-</svg>`
+if (!existsSync(SRC)) {
+  console.error(`missing ${SRC} — the real logo artwork is required`)
+  process.exit(1)
+}
 
 mkdirSync('public', { recursive: true })
-writeFileSync('public/icon.svg', svg)
 
-const png = (size) => sharp(Buffer.from(svg)).resize(size, size).png()
+const mark = await sharp(SRC).extract(S_CROP).png().toBuffer()
 
-await png(180).toFile('public/apple-touch-icon.png')
-await png(192).toFile('public/icon-192.png')
-await png(512).toFile('public/icon-512.png')
+/** The mark centred on the brand ground, at `size`. */
+async function icon(size) {
+  const inner = Math.round(size * 0.62)
+  const glyph = await sharp(mark).resize({ height: inner, fit: 'inside' }).toBuffer()
+  return sharp({
+    create: { width: size, height: size, channels: 4, background: INK },
+  })
+    .composite([{ input: glyph, gravity: 'center' }])
+    .png({ compressionLevel: 9 })
+}
 
-// ICO with a single 32x32 PNG payload (supported since Vista).
-const buf = await png(32).toBuffer()
+await (await icon(180)).toFile('public/apple-touch-icon.png')
+await (await icon(192)).toFile('public/icon-192.png')
+await (await icon(512)).toFile('public/icon-512.png')
+
+// Scalable icon: the real mark embedded, so it stays sharp at any size.
+const markB64 = (await sharp(mark).resize({ width: 256 }).png().toBuffer()).toString('base64')
+writeFileSync(
+  'public/icon.svg',
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="${INK}"/>
+  <image x="17" y="12" width="30" height="40" href="data:image/png;base64,${markB64}"/>
+</svg>`,
+)
+
+// ICO with a single 32x32 PNG payload.
+const buf = await (await icon(32)).toBuffer()
 const header = Buffer.alloc(22)
-header.writeUInt16LE(0, 0) // reserved
-header.writeUInt16LE(1, 2) // type: icon
-header.writeUInt16LE(1, 4) // count
-header.writeUInt8(32, 6) // width
-header.writeUInt8(32, 7) // height
-header.writeUInt8(0, 8) // palette
-header.writeUInt8(0, 9) // reserved
-header.writeUInt16LE(1, 10) // colour planes
-header.writeUInt16LE(32, 12) // bits per pixel
+header.writeUInt16LE(0, 0)
+header.writeUInt16LE(1, 2)
+header.writeUInt16LE(1, 4)
+header.writeUInt8(32, 6)
+header.writeUInt8(32, 7)
+header.writeUInt16LE(1, 10)
+header.writeUInt16LE(32, 12)
 header.writeUInt32LE(buf.length, 14)
-header.writeUInt32LE(22, 18) // offset
+header.writeUInt32LE(22, 18)
 writeFileSync('public/favicon.ico', Buffer.concat([header, buf]))
 
 writeFileSync(
@@ -67,4 +86,4 @@ writeFileSync(
   ),
 )
 
-console.log('icons written to public/')
+console.log('icons written from the real logo artwork')

@@ -361,7 +361,8 @@ export function Contact() {
 export function Footer() {
   return (
     <footer className="footer">
-      <Logo className="footer__logo" height={38} />
+      {/* Three-line lockup, so it needs more height than a single-line wordmark. */}
+      <Logo className="footer__logo" height={56} />
       <span className="mono">
         {business.address.street} · {business.address.city} {business.address.postcode}
       </span>
