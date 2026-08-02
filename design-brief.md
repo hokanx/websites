@@ -93,8 +93,35 @@ One label per intent page-wide.
 
 ## Open items
 
-- Real logo file and real photos are not reachable from this session (egress
-  policy blocks every host except GitHub). They must be supplied by the owner
-  or the corresponding sections fall back to generated imagery.
+- Real logo file: still not available. The header/footer mark stays a coded
+  typographic wordmark (no AI generation) rather than an invented logo.
 - Named review quotes still needed; only paraphrased review themes were
   retrievable via search.
+
+## Asset sourcing (rebuild pass)
+
+This session's environment still can't reach `higgsfield.ai`/`.app` or its
+CloudFront asset hosts by direct network access (org egress policy, confirmed
+via the proxy status log) — so nothing could be downloaded into `public/`.
+Instead, the hero film and gallery reference the already-generated Higgsfield
+assets for this project **directly by their CDN URL**, spending zero new
+generation credits:
+
+- Hero poster + gallery stills: the existing petrol/amber-palette generations
+  (mise-en-place macro, lantern bokeh, steam plate).
+- Hero film: two existing clips, played as a **hard-cut chaptered film**
+  rather than one blended take — they weren't generated with the last-frame
+  chaining technique (each starts from an independent still), so faking a
+  seamless single shot would only expose video-seek jitter. Clip A (mise en
+  place push-in) covers chapter 1; clip B (wok ignition through to the
+  plated dish) covers chapters 2–3.
+- Scrubbing binds scroll progress to each `<video>`'s `currentTime` instead
+  of the canonical baked-webp canvas sequence, since that needs local
+  `ffmpeg` access to the source clips. Smooth in both directions on desktop;
+  expect more jitter than the canvas method on scrubbing backward, especially
+  on lower-end mobile. Swapping in the canonical frame sequence later (once
+  the network policy allows fetching the clips) is a contained follow-up —
+  `initFilm()` in `src/main.js` is the only place that needs to change.
+- Trade-off accepted knowingly with the client-facing side: this build is
+  meant to be shown to the client first; if they buy, the assets get migrated
+  to self-hosting so the site doesn't depend on Higgsfield's CDN staying up.

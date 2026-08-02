@@ -36,161 +36,44 @@ function initSmoothScroll() {
   return lenis;
 }
 
-/* ── frame sequence loader ─────────────────────────────────────
-   Streams the webp sequence with a small parallel pool and always
-   draws the nearest frame that has actually arrived. */
-class FrameSequence {
-  constructor({ count, path, pad, ext }) {
-    this.count = count;
-    this.path = path;
-    this.pad = pad;
-    this.ext = ext;
-    this.images = new Array(count).fill(null);
-    this.loaded = new Uint8Array(count);
-    this.loadedTotal = 0;
-  }
-
-  url(i) {
-    return `${this.path}/f-${String(i + 1).padStart(this.pad, '0')}.${this.ext}`;
-  }
-
-  loadOne(i) {
-    return new Promise((resolve) => {
-      if (this.loaded[i]) return resolve();
-      const img = new Image();
-      img.decoding = 'async';
-      img.onload = () => {
-        this.images[i] = img;
-        this.loaded[i] = 1;
-        this.loadedTotal += 1;
-        resolve();
-      };
-      img.onerror = () => resolve();
-      img.src = this.url(i);
-    });
-  }
-
-  /* frame 1 first so the canvas can take over from the poster fast,
-     then everything else through a 6-wide pool */
-  async start(onFirst) {
-    await this.loadOne(0);
-    onFirst?.();
-
-    const queue = [];
-    for (let i = 1; i < this.count; i++) queue.push(i);
-
-    const POOL = 6;
-    const workers = Array.from({ length: POOL }, async () => {
-      while (queue.length) {
-        const i = queue.shift();
-        if (i === undefined) break;
-        await this.loadOne(i);
-      }
-    });
-    await Promise.all(workers);
-  }
-
-  /* nearest loaded frame, searching outward from the wanted index */
-  nearest(index) {
-    if (this.loaded[index]) return this.images[index];
-    for (let d = 1; d < this.count; d++) {
-      const lo = index - d;
-      const hi = index + d;
-      if (lo >= 0 && this.loaded[lo]) return this.images[lo];
-      if (hi < this.count && this.loaded[hi]) return this.images[hi];
-    }
-    return null;
-  }
-}
-
-/* ── cover-fit canvas renderer ─────────────────────────────────── */
-class CanvasStage {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d', { alpha: false });
-    this.current = null;
-    this.resize();
-    window.addEventListener('resize', () => {
-      this.resize();
-      if (this.current) this.draw(this.current);
-    }, { passive: true });
-  }
-
-  resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = this.canvas.clientWidth || window.innerWidth;
-    const h = this.canvas.clientHeight || window.innerHeight;
-    this.canvas.width = Math.round(w * dpr);
-    this.canvas.height = Math.round(h * dpr);
-    this.w = this.canvas.width;
-    this.h = this.canvas.height;
-  }
-
-  draw(img) {
-    if (!img) return;
-    this.current = img;
-    const { ctx, w, h } = this;
-    const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-    const dw = img.naturalWidth * scale;
-    const dh = img.naturalHeight * scale;
-    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
-  }
-}
-
-/* ── the hero film ─────────────────────────────────────────────── */
-async function initFilm() {
+/* ── the hero film: two chaptered clips, scroll-driven ───────────
+   The clips weren't generated with last-frame chaining, so this
+   plays as a hard-cut chaptered film rather than one blended take:
+   clip A (mise en place) then clip B (fire through to the plate),
+   each scrubbed by setting currentTime from scroll progress. */
+function initFilm() {
   const section = document.querySelector('.film');
-  const canvas = document.querySelector('.film__canvas');
   const poster = document.querySelector('.film__poster');
+  const videos = gsap.utils.toArray('.film__video');
   const railFill = document.querySelector('.film__rail i');
   const stages = gsap.utils.toArray('.film__stages .stage');
   const brand = document.querySelector('.film__brand');
-  if (!section || !canvas) return;
+  if (!section || !videos.length) return;
 
   /* reduced motion: no pin, no scrub. Poster and chapter 1 only. */
   if (REDUCED) {
-    canvas.remove();
+    videos.forEach((v) => v.remove());
     return;
   }
 
-  let manifest;
-  try {
-    const res = await fetch('/frames/hero/manifest.json', { cache: 'force-cache' });
-    if (!res.ok) throw new Error('no manifest');
-    manifest = await res.json();
-  } catch {
-    /* film not generated yet: the poster stays, the page still works */
-    canvas.remove();
-    return;
-  }
+  const CHAPTER_END = 0.88; // final 12% is held on the last frame for the logo landing
+  const boundary = CHAPTER_END / CHAPTERS; // end of clip A's slice
 
-  const seq = new FrameSequence({
-    count: manifest.count,
-    path: manifest.path || '/frames/hero',
-    pad: manifest.pad || 3,
-    ext: manifest.ext || 'webp',
+  const ready = new Uint8Array(videos.length);
+  videos.forEach((v, i) => {
+    v.addEventListener('loadedmetadata', () => { ready[i] = 1; });
+    v.pause();
   });
+  videos[0]?.addEventListener('loadeddata', () => poster?.style.setProperty('opacity', '0'), { once: true });
 
-  const stage = new CanvasStage(canvas);
-  const state = { frame: 0 };
-  let raf = null;
-
-  const render = () => {
-    raf = null;
-    const idx = Math.min(seq.count - 1, Math.max(0, Math.round(state.frame)));
-    const img = seq.nearest(idx);
-    if (img) stage.draw(img);
+  let activeIndex = -1;
+  const setActive = (i) => {
+    if (i === activeIndex) return;
+    activeIndex = i;
+    videos.forEach((v, n) => v.classList.toggle('is-active', n === i));
   };
-  const schedule = () => {
-    if (raf === null) raf = requestAnimationFrame(render);
-  };
+  setActive(0);
 
-  seq.start(() => {
-    stage.draw(seq.images[0]);
-    poster?.style.setProperty('opacity', '0');
-  }).then(schedule);
-
-  /* one trigger drives frame index, rail, chapter stages and logo */
   let activeStage = -1;
   const setStage = (i) => {
     if (i === activeStage) return;
@@ -199,6 +82,24 @@ async function initFilm() {
   };
   setStage(0);
 
+  let raf = null;
+  let pendingP = 0;
+  const render = () => {
+    raf = null;
+    const p = pendingP;
+    const clipIndex = p < boundary ? 0 : 1;
+    setActive(clipIndex);
+    const v = videos[clipIndex];
+    if (!ready[clipIndex] || !v.duration) return;
+    const local = clipIndex === 0
+      ? p / boundary
+      : (p - boundary) / (CHAPTER_END - boundary);
+    v.currentTime = gsap.utils.clamp(0, v.duration, gsap.utils.clamp(0, 1, local) * v.duration);
+  };
+  const schedule = () => {
+    if (raf === null) raf = requestAnimationFrame(render);
+  };
+
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
@@ -206,15 +107,14 @@ async function initFilm() {
     scrub: 0.6,
     onUpdate: (self) => {
       const p = self.progress;
-
-      state.frame = p * (seq.count - 1);
+      pendingP = p;
       schedule();
 
       if (railFill) gsap.set(railFill, { scaleY: p });
 
       /* chapters occupy equal slices, but the last slice hands the
          final 12% over to the logo landing */
-      const filmPart = Math.min(p / 0.88, 1);
+      const filmPart = Math.min(p / CHAPTER_END, 1);
       setStage(Math.min(CHAPTERS - 1, Math.floor(filmPart * CHAPTERS)));
 
       if (brand) {

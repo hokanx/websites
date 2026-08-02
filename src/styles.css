@@ -100,14 +100,15 @@ a { color: inherit; }
 }
 
 .film__poster,
-.film__canvas {
+.film__video {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
 }
 
-.film__canvas { z-index: 2; }
-.film__poster  { z-index: 1; }
+.film__video { z-index: 2; opacity: 0; }
+.film__video.is-active { opacity: 1; }
+.film__poster { z-index: 1; transition: opacity 0.4s var(--ease); }
 
 .film__vignette {
   position: absolute; inset: 0; z-index: 3;
