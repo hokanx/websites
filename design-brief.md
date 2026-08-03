@@ -25,20 +25,26 @@ Chapters (3):
 
 ## Palette
 
-Derived from the restaurant's real interior (Google listing photo): petrol-teal
-banquettes, warm wood slats, cream paper panels, amber pendant lanterns, black
-steel pass.
+**Superseded.** The first version of this brief derived a petrol-teal palette
+from the dining-room photo. The owner then supplied the real logo, and real
+brand assets win: the mark is white on lacquer red. The red below is sampled
+directly from that file, not guessed.
 
-| Role | Hex | Where it comes from |
+| Role | Hex | Source |
 |---|---|---|
-| Ground (dark) | `#0C1F24` | banquette teal, driven to near-black |
-| Surface | `#17414A` | the mid petrol of the seating and tiled pass |
-| Light text | `#F2EAD9` | the cream shoji-style wall panels |
-| Accent (only one) | `#E4863A` | the amber glow of the pendant lanterns |
+| Brand | `#962D27` | sampled from the logo field, rgb(150,45,39) |
+| Brand deep | `#6E1F1B` | pressed state of the same red |
+| Accent (type) | `#D14A3C` | same hue lifted, so small type stays legible on the dark ground |
+| Ground | `#14100F` | warm near-black, lets the red read as the brand colour |
+| Surface | `#2A1D1A` | lifted ground for the info column |
+| Light | `#F5F0E8` | the logo's white, warmed slightly for long-form text |
 
-Deliberately *not* black+neon, not beige+brass "artisan", not purple glow. The
-teal ground is the unusual note and it is real — it is literally the color of
-their chairs.
+The red is used for solid blocks and the mark; `#D14A3C` for eyebrows, rules
+and hairlines where `#962D27` would fail contrast at small sizes.
+
+The film's chapter 1 was generated before the logo arrived, in amber lantern
+light against dark shadow. Amber sits harmoniously against brick red, so that
+clip is still usable; only the teal ground was dropped.
 
 ## Type
 

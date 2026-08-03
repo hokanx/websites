@@ -221,7 +221,7 @@ async function initFilm() {
         const t = gsap.utils.clamp(0, 1, (p - 0.95) / 0.05);
         gsap.set(brand, {
           opacity: t,
-          backgroundColor: `rgba(12,31,36,${t * 0.82})`,
+          backgroundColor: `rgba(20,16,15,${t * 0.82})`,
         });
         gsap.set(brand.querySelector('.film__wordmark'), {
           scale: 0.92 + t * 0.08,
